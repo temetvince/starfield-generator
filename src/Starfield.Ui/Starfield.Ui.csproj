@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Starfield.Ui</RootNamespace>
+    <AssemblyName>starfield-ui</AssemblyName>
+    <Description>Desktop front end that composes and runs starfield command lines.</Description>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+    <!-- Avalonia's Linux backend pulls in a Tmds.DBus.Protocol release that carries advisory
+         GHSA-xrw6-gwf8-vvr9; referencing the current release directly lifts the transitive version. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.95.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Starfield.App\Starfield.App.csproj" />
+  </ItemGroup>
+
+</Project>

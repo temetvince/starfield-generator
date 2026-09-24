@@ -1,0 +1,42 @@
+<Project>
+
+  <!-- Repo-wide build settings for every project (the libraries, the CLI, and the tests). The point
+       is a hard "no warnings, no squiggles" gate: analyzer and code-style diagnostics become build
+       ERRORS, so what would otherwise be a yellow squiggle in the editor fails the build (and CI)
+       instead of being ignored. The rule severities themselves live in .editorconfig.
+
+       This is the only Directory.Build.props in the repo; every project sits under it, so no project
+       can escape the gate. -->
+
+  <!-- Language and platform baseline shared by every project. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Every compiler/analyzer warning is an error. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Run the .NET code-quality (CAxxxx) analyzers at the Recommended set, newest rules. -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+
+    <!-- Also run the IDE code-style (IDExxxx) rules during build, not just in the editor — this is
+         what turns "this could be improved" editor squiggles into build diagnostics on the CLI. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- IDE0005 (remove unnecessary usings) only runs at build with the XML doc file generated. The
+         libraries are XML-documented anyway, so this is a bonus (consumers get IntelliSense docs). We
+         do NOT mandate doc-completeness, though: CS1591 (missing XML comment on a public member) is a
+         documentation policy, not a code-quality squiggle, and would nag every test/DTO/entry point —
+         so it is the one diagnostic we opt out of. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>

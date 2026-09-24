@@ -1,0 +1,65 @@
+# Git attributes for a .NET solution.
+#
+# Line endings are normalised to LF in the repository and checked out as LF on every platform, which
+# matches .editorconfig. Only Windows script formats are checked out as CRLF, because cmd.exe and
+# PowerShell misread LF-only files. Anything git cannot identify as text is left untouched.
+
+# Default: detect text, store and check out as LF.
+* text=auto eol=lf
+
+# .NET source and project files.
+*.cs        text diff=csharp
+*.axaml     text
+*.csproj    text
+*.props     text
+*.targets   text
+*.sln       text
+*.slnx      text
+*.resx      text
+*.runsettings text
+*.ruleset   text
+global.json text
+nuget.config text
+
+# Configuration and documentation.
+*.json      text
+*.xml       text
+*.yml       text
+*.yaml      text
+*.md        text diff=markdown
+*.txt       text
+.editorconfig  text
+.gitattributes text
+.gitignore     text
+.markdownlint.json text
+
+# Scripts: Unix shells need LF, Windows shells need CRLF.
+*.sh        text eol=lf
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+*.psd1      text eol=crlf
+
+# Binary assets and build outputs that may ever be committed.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.webp      binary
+*.pdf       binary
+*.zip       binary
+*.7z        binary
+*.gz        binary
+*.dll       binary
+*.exe       binary
+*.pdb       binary
+*.nupkg     binary
+*.snupkg    binary
+*.snk       binary
+*.pfx       binary
+*.ttf       binary
+*.otf       binary
+*.woff      binary
+*.woff2     binary

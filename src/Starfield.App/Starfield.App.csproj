@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Starfield.App</RootNamespace>
+    <Description>Framework-neutral application layer for the star field front end: view models and in-process rendering.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Starfield.Core\Starfield.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,99 @@
+# ---------------------------------------------------------------------------
+# .NET / C# build output
+# ---------------------------------------------------------------------------
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Build / publish artifacts
+artifacts/
+publish/
+
+# ---------------------------------------------------------------------------
+# MonoGame Content Pipeline
+# ---------------------------------------------------------------------------
+# Compiled content (.xnb) and the pipeline's intermediate/output folders. The
+# .mgcb project and the raw source assets stay tracked; built output does not.
+**/Content/bin/
+**/Content/obj/
+*.mgstats
+
+# ---------------------------------------------------------------------------
+# Visual Studio / Rider / VS Code user-specific files
+# ---------------------------------------------------------------------------
+.vs/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+.idea/
+*.sln.docstates
+
+# VS Code: ignore per-user state, keep shared workspace config (tasks, launch).
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ---------------------------------------------------------------------------
+# Server persistence (LiteDB save files written at runtime)
+# ---------------------------------------------------------------------------
+saves/
+*.db
+*-log.db
+
+# ---------------------------------------------------------------------------
+# Logs written at runtime
+# ---------------------------------------------------------------------------
+logs/
+*.log
+
+# ---------------------------------------------------------------------------
+# Test / coverage output
+# ---------------------------------------------------------------------------
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+coverage*.cobertura.xml
+*.trx
+
+# ---------------------------------------------------------------------------
+# NuGet
+# ---------------------------------------------------------------------------
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# ---------------------------------------------------------------------------
+# OS / editor cruft
+# ---------------------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*~
+*.swp
+
+# ---------------------------------------------------------------------------
+# LLMs
+# ---------------------------------------------------------------------------
+.claude/
+
+# ---------------------------------------------------------------------------
+# Content
+# ---------------------------------------------------------------------------
+Content/
+
+# TVG.Shared/Content is small, code-referenced data — the atlas metadata and the baked collision hitboxes —
+# embedded into the assembly at build, so it must be committed and travel with the repo (a clean clone or CI
+# build needs it). The client's Content/ (large images, compiled shaders) stays ignored.
+!TVG/TVG.Shared/Content/
+!TVG/TVG.Shared/Content/**

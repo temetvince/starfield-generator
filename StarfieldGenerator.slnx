@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Imaging.Core/Imaging.Core.csproj" />
+    <Project Path="src/Starfield.App/Starfield.App.csproj" />
+    <Project Path="src/Starfield.Cli/Starfield.Cli.csproj" />
+    <Project Path="src/Starfield.Core/Starfield.Core.csproj" />
+    <Project Path="src/Starfield.Ui/Starfield.Ui.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Imaging.Core.Tests/Imaging.Core.Tests.csproj" />
+    <Project Path="tests/Imaging.TestSupport/Imaging.TestSupport.csproj" />
+    <Project Path="tests/Starfield.App.Tests/Starfield.App.Tests.csproj" />
+    <Project Path="tests/Starfield.Cli.Tests/Starfield.Cli.Tests.csproj" />
+    <Project Path="tests/Starfield.Core.Tests/Starfield.Core.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Starfield.Core</RootNamespace>
+    <Description>Star field and nebula layer renderers plus the options model that describes them.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Imaging.Core\Imaging.Core.csproj" />
+  </ItemGroup>
+
+</Project>

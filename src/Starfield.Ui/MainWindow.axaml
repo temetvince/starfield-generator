@@ -1,0 +1,163 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Starfield.Ui.MainWindow"
+        Title="Starfield Generator"
+        Width="1180" Height="760" MinWidth="900" MinHeight="600"
+        FontFamily="Inter, Segoe UI, sans-serif">
+
+  <Window.Background>
+    <SolidColorBrush Color="#05060F" />
+  </Window.Background>
+
+  <Window.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#E60E1226" />
+      <Setter Property="BorderBrush" Value="#2A3157" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="22" />
+      <Setter Property="BoxShadow" Value="0 12 32 0 #66000000" />
+    </Style>
+    <Style Selector="TextBlock.title">
+      <Setter Property="FontSize" Value="30" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="#F4F2FF" />
+    </Style>
+    <Style Selector="TextBlock.tagline">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Foreground" Value="#9BA3CF" />
+      <Setter Property="Margin" Value="0,4,0,0" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#8F97C8" />
+      <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="#C9CDEA" />
+      <Setter Property="Margin" Value="0,10,0,5" />
+    </Style>
+    <Style Selector="TextBlock.notice">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="MaxWidth" Value="720" />
+    </Style>
+    <Style Selector="TextBlock.empty">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Foreground" Value="#5F679A" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="#0A0D1F" />
+      <Setter Property="BorderBrush" Value="#2E3560" />
+      <Setter Property="CornerRadius" Value="9" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Foreground" Value="#F0F1FA" />
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="Background" Value="#0A0D1F" />
+      <Setter Property="BorderBrush" Value="#2E3560" />
+      <Setter Property="CornerRadius" Value="9" />
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="9" />
+      <Setter Property="Padding" Value="16,9" />
+      <Setter Property="Background" Value="#1B2040" />
+      <Setter Property="BorderBrush" Value="#2E3560" />
+      <Setter Property="Foreground" Value="#E4E6F5" />
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#262C55" />
+      <Setter Property="BorderBrush" Value="#3E4778" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#7C5CFF" />
+      <Setter Property="BorderBrush" Value="#7C5CFF" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Padding" Value="22,11" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#9279FF" />
+      <Setter Property="BorderBrush" Value="#9279FF" />
+    </Style>
+    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#151A33" />
+      <Setter Property="Foreground" Value="#5A6190" />
+    </Style>
+    <Style Selector="ProgressBar">
+      <Setter Property="Foreground" Value="#7C5CFF" />
+      <Setter Property="Background" Value="#1B2040" />
+      <Setter Property="Height" Value="6" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+  </Window.Styles>
+
+  <Grid>
+    <Border Background="#4D03040C" />
+
+    <ProgressBar IsIndeterminate="True" IsVisible="{Binding !HasBackdrop}" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="28,22,28,24" IsVisible="{Binding HasBackdrop}">
+
+      <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,6,0,22">
+        <TextBlock Classes="title" Text="Starfield Generator" HorizontalAlignment="Center" />
+        <TextBlock Classes="tagline" Text="Endless skies from a single number. Pick a size and seed, then render." HorizontalAlignment="Center" />
+      </StackPanel>
+
+      <Border Grid.Row="1" Classes="card" Padding="22,16,22,18">
+        <StackPanel>
+          <Grid ColumnDefinitions="*,14,120,14,120,14,220,10,Auto,24,Auto">
+            <StackPanel Grid.Column="0">
+              <TextBlock Classes="label" Margin="0,0,0,6" Text="Save as" ToolTip.Tip="The PNG to write. Any existing file is replaced." />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox Text="{Binding Request.OutputPath}" ToolTip.Tip="The PNG to write. Any existing file is replaced." />
+                <Button Grid.Column="1" Margin="8,0,0,0" Content="Browse" Click="BrowseOutput" />
+              </Grid>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Classes="label" Margin="0,0,0,6" Text="Width (px)" ToolTip.Tip="Image width in pixels. Blank uses the default." />
+              <TextBox Text="{Binding Request.Width}" PlaceholderText="{Binding Request.Defaults.Width}" ToolTip.Tip="Image width in pixels. Blank uses the default." />
+            </StackPanel>
+            <StackPanel Grid.Column="4">
+              <TextBlock Classes="label" Margin="0,0,0,6" Text="Height (px)" ToolTip.Tip="Image height in pixels. Blank uses the default." />
+              <TextBox Text="{Binding Request.Height}" PlaceholderText="{Binding Request.Defaults.Height}" ToolTip.Tip="Image height in pixels. Blank uses the default." />
+            </StackPanel>
+            <StackPanel Grid.Column="6">
+              <TextBlock Classes="label" Margin="0,0,0,6" Text="Seed" ToolTip.Tip="The same seed always produces the same sky. Blank uses the default." />
+              <TextBox Text="{Binding Request.Seed}" PlaceholderText="{Binding Request.Defaults.Seed}" ToolTip.Tip="The same seed always produces the same sky. Blank uses the default." />
+            </StackPanel>
+            <Button Grid.Column="8" VerticalAlignment="Bottom" Content="Random seed" Command="{Binding RandomSeedCommand}" />
+            <Grid Grid.Column="10" Width="150" VerticalAlignment="Bottom">
+              <Button Classes="primary" Content="Render" Command="{Binding RenderCommand}" IsVisible="{Binding !IsRunning}" />
+              <Button Classes="primary" Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding IsRunning}" />
+            </Grid>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="2" Classes="card" Padding="14" Margin="0,16,0,0">
+        <Grid>
+          <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsRunning}" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <TextBlock Classes="empty" Text="Your starfield will appear here." IsVisible="{Binding ShowPlaceholder}" />
+          <TextBlock Classes="notice" Text="{Binding Notice}" Foreground="{Binding NoticeColour}" IsVisible="{Binding ShowNoticeCentred}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Border CornerRadius="10" ClipToBounds="True" IsVisible="{Binding HasPreview}">
+            <Image Name="PreviewImage" Stretch="Uniform" />
+          </Border>
+          <Border IsVisible="{Binding ShowNoticeCaption}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12" Background="#D90A0D1F" CornerRadius="8" Padding="14,6">
+            <TextBlock Classes="notice" Text="{Binding Notice}" Foreground="{Binding NoticeColour}" />
+          </Border>
+        </Grid>
+      </Border>
+
+    </Grid>
+  </Grid>
+</Window>

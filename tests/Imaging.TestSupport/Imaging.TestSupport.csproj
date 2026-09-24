@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Imaging.TestSupport</RootNamespace>
+    <Description>Test-only helpers shared by the test projects, including a minimal PNG decoder.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Imaging.Core\Imaging.Core.csproj" />
+  </ItemGroup>
+
+</Project>
