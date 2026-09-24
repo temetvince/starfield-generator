@@ -67,6 +67,14 @@ public static class CliParser
                     result = result with { SeamlessX = true };
                     break;
 
+                case CliOptionNames.NoSeamlessY:
+                    result = result with { SeamlessY = false };
+                    break;
+
+                case CliOptionNames.SeamlessY:
+                    result = result with { SeamlessY = true };
+                    break;
+
                 case CliOptionNames.Out or CliOptionNames.OutShort:
                     result = result with { OutputPath = TakeValue(args, ref index, token, errors) ?? result.OutputPath };
                     break;

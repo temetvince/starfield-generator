@@ -66,7 +66,9 @@ Two design points are worth stating:
 
 - **The centre line meanders rather than tilts.** A tilted line would arrive at the right-hand edge at a
   different height than it left the left-hand edge, breaking a seamless image at exactly the join it is
-  meant to hide. Noise with the image's period cannot do that.
+  meant to hide. Noise with the image's period cannot do that. When the image also tiles vertically,
+  distance from the centre line is measured the short way round the tile, so the band is a ring and
+  the rows just above the top edge see the band just below the bottom.
 - **Clustering is applied by rejection, not by scaling counts.** Each cell offers candidates at the
   highest density the field can reach, and each candidate survives in proportion to the density where it
   landed. Scaling the count per cell instead would make density change in visible 64-pixel steps. It also
@@ -110,6 +112,8 @@ what produces a believable population of many faint stars and a few blazing ones
 brightness, with a jitter of ±20% so a layer does not look stamped from one template.
 
 When `SeamlessX` is set, a star whose reach crosses an image edge is emitted twice, once on each side.
+`SeamlessY` does the same for the top and bottom: a cell row beyond either edge yields exact copies of
+the row at the other edge, shifted by the image height.
 
 ## How the nebula is drawn
 
@@ -139,7 +143,9 @@ plane, and following it is what keeps the clouds and the star band reading as on
 two unrelated pictures sharing a frame.
 
 Warping preserves seamlessness. The warp field repeats with the image width, so displacing by it cannot
-break the structure field's own repeat.
+break the structure field's own repeat. With `SeamlessY` every field is also given a vertical period
+equal to the image's aspect ratio, so it repeats after a whole number of cells down the image height,
+with the cells stretched by at most half a cell to make that count whole.
 
 ## Options and validation
 

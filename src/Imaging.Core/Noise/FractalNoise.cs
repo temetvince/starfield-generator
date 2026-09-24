@@ -24,6 +24,8 @@ public sealed class FractalNoise
 {
     private readonly ImmutableArray<TilingPerlinNoise> _octaves;
     private readonly ImmutableArray<int> _periods;
+    private readonly ImmutableArray<int> _periodsY;
+    private readonly ImmutableArray<float> _scalesY;
     private readonly ImmutableArray<float> _amplitudes;
     private readonly float _amplitudeTotal;
     private readonly FractalNoiseShape _shape;
@@ -52,6 +54,8 @@ public sealed class FractalNoise
 
         var octaves = ImmutableArray.CreateBuilder<TilingPerlinNoise>(options.Octaves);
         var periods = ImmutableArray.CreateBuilder<int>(options.Octaves);
+        var periodsY = ImmutableArray.CreateBuilder<int>(options.Octaves);
+        var scalesY = ImmutableArray.CreateBuilder<float>(options.Octaves);
         var amplitudes = ImmutableArray.CreateBuilder<float>(options.Octaves);
 
         var frequency = options.BaseFrequency;
@@ -61,8 +65,23 @@ public sealed class FractalNoise
         for (var octave = 0; octave < options.Octaves; octave++)
         {
             octaves.Add(new TilingPerlinNoise(Hash64.Combine(seed, (ulong)octave)));
-            periods.Add(Math.Max(1, (int)MathF.Round(frequency)));
+            var period = Math.Max(1, (int)MathF.Round(frequency));
+            periods.Add(period);
             amplitudes.Add(amplitude);
+
+            // Vertically the lattice must also end on a whole cell where the field is meant to repeat,
+            // so the octave's y scale is chosen to put exactly that many cells across the period.
+            if (options.VerticalPeriod > 0.0f)
+            {
+                var periodY = Math.Max(1, (int)MathF.Round(frequency * options.VerticalPeriod));
+                periodsY.Add(periodY);
+                scalesY.Add(periodY / options.VerticalPeriod);
+            }
+            else
+            {
+                periodsY.Add(0);
+                scalesY.Add(period);
+            }
 
             total += amplitude;
             frequency *= options.Lacunarity;
@@ -71,6 +90,8 @@ public sealed class FractalNoise
 
         _octaves = octaves.MoveToImmutable();
         _periods = periods.MoveToImmutable();
+        _periodsY = periodsY.MoveToImmutable();
+        _scalesY = scalesY.MoveToImmutable();
         _amplitudes = amplitudes.MoveToImmutable();
         _amplitudeTotal = total;
     }
@@ -90,7 +111,7 @@ public sealed class FractalNoise
         for (var octave = 0; octave < _octaves.Length; octave++)
         {
             var period = _periods[octave];
-            var raw = _octaves[octave].Sample(x * period, y * period, _seamlessX ? period : 0);
+            var raw = _octaves[octave].Sample(x * period, y * _scalesY[octave], _seamlessX ? period : 0, _periodsY[octave]);
             sum += Fold(raw) * _amplitudes[octave];
         }
 

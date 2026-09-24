@@ -81,6 +81,9 @@ public sealed class RenderRequestViewModel : ObservableObject
     /// <summary>Gets or sets the seed text; blank means the default.</summary>
     public string Seed { get; set => SetProperty(ref field, value); } = "";
 
+    /// <summary>Gets or sets whether the image also tiles top to bottom, for a texture that repeats both ways. On by default.</summary>
+    public bool TileVertically { get; set => SetProperty(ref field, value); } = true;
+
     /// <summary>Gets or sets whether the nebula uses <see cref="RimColour"/> and <see cref="CoreColour"/> instead of a seed-chosen palette.</summary>
     public bool UseCustomColours { get; set => SetProperty(ref field, value); }
 
@@ -136,7 +139,7 @@ public sealed class RenderRequestViewModel : ObservableObject
         var nebula = UseCustomColours ? CustomNebula(preset.Nebula, problems) : preset.Nebula;
 
         return problems.Count == 0
-            ? new RequestBuildResult(preset with { Width = width, Height = height, Seed = seed, Nebula = nebula }, outputPath, [])
+            ? new RequestBuildResult(preset with { Width = width, Height = height, Seed = seed, Nebula = nebula, SeamlessY = TileVertically }, outputPath, [])
             : new RequestBuildResult(null, outputPath, problems.ToImmutable());
     }
 

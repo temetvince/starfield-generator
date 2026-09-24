@@ -44,6 +44,7 @@ public static class CliCommandLine
         AddNumber(tokens, CliOptionNames.Exposure, arguments.Exposure);
         AddValue(tokens, CliOptionNames.Background, arguments.Background);
         AddSwitch(tokens, CliOptionNames.Seamless, CliOptionNames.NoSeamless, arguments.SeamlessX);
+        AddSwitch(tokens, CliOptionNames.SeamlessY, CliOptionNames.NoSeamlessY, arguments.SeamlessY);
         AddSwitch(tokens, CliOptionNames.Nebula, CliOptionNames.NoNebula, arguments.NebulaEnabled);
 
         AddNumber(tokens, CliOptionNames.Threads, arguments.Threads);

@@ -46,6 +46,16 @@ public sealed record StarfieldOptions
     /// </value>
     public bool SeamlessX { get; init; } = true;
 
+    /// <summary>Gets whether the top and bottom edges join seamlessly as well.</summary>
+    /// <value>
+    /// <see langword="true"/> by default, which makes the image a tile that repeats in both directions:
+    /// every noise field also wraps to a whole number of cells vertically, stars that straddle the top or
+    /// bottom are drawn on both sides, and the galactic band is measured around the tile so it becomes
+    /// a ring rather than stopping at the edge. <see langword="false"/> leaves the top and bottom as
+    /// plain edges, which keeps the full vertical detail of the noise on a very wide, short image.
+    /// </value>
+    public bool SeamlessY { get; init; } = true;
+
     /// <summary>Gets the colour behind everything.</summary>
     /// <value>
     /// An sRGB hex string. Near-black rather than pure black usually looks better, since deep space in

@@ -24,6 +24,8 @@ public static class HelpText
           -b, --background <hex>    Background colour, such as #02030A
               --seamless            Make the left and right edges join. This is the default.
               --no-seamless         Do not wrap the edges.
+              --seamless-y          Also join the top and bottom, for a tile that repeats both ways. This is the default.
+              --no-seamless-y       Do not wrap the top and bottom.
               --nebula              Render the nebula. This is the default.
               --no-nebula           Render stars only.
 

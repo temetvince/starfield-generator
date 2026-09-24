@@ -35,7 +35,7 @@ public sealed class ClusteringTests
     public void Collect_GathersStarsOntoTheBand()
     {
         var density = new StarDensityField(Banded, Size, 1UL, seamlessX: true);
-        var field = new StarCellField(Layer, Size, 1UL, 0, seamlessX: true, density);
+        var field = new StarCellField(Layer, Size, 1UL, 0, seamlessX: true, seamlessY: false, density);
 
         var onBand = CountBetween(field, 360, 440);
         var offBand = CountBetween(field, 0, 80);
@@ -48,7 +48,7 @@ public sealed class ClusteringTests
     {
         var density = new StarDensityField(Banded, Size, 1UL, seamlessX: true);
         var layer = Layer with { ClusteringResponse = 0.0f };
-        var field = new StarCellField(layer, Size, 1UL, 0, seamlessX: true, density);
+        var field = new StarCellField(layer, Size, 1UL, 0, seamlessX: true, seamlessY: false, density);
 
         var onBand = CountBetween(field, 360, 440);
         var offBand = CountBetween(field, 0, 80);
@@ -62,7 +62,7 @@ public sealed class ClusteringTests
         // Rejection happens on a candidate's own position, so slicing the image must not change which
         // candidates survive. This is the band-independence guarantee applied to clustering.
         var density = new StarDensityField(new StarClusteringOptions(), Size, 3UL, seamlessX: true);
-        var field = new StarCellField(Layer, Size, 3UL, 0, seamlessX: true, density);
+        var field = new StarCellField(Layer, Size, 3UL, 0, seamlessX: true, seamlessY: false, density);
 
         var whole = new List<Star>();
         field.Collect(0, Size.Height - 1, whole);
@@ -85,10 +85,10 @@ public sealed class ClusteringTests
         var density = new StarDensityField(new StarClusteringOptions(), Size, 5UL, seamlessX: true);
 
         var first = new List<Star>();
-        new StarCellField(Layer, Size, 5UL, 0, seamlessX: true, density).Collect(0, Size.Height - 1, first);
+        new StarCellField(Layer, Size, 5UL, 0, seamlessX: true, seamlessY: false, density).Collect(0, Size.Height - 1, first);
 
         var second = new List<Star>();
-        new StarCellField(Layer, Size, 5UL, 0, seamlessX: true, density).Collect(0, Size.Height - 1, second);
+        new StarCellField(Layer, Size, 5UL, 0, seamlessX: true, seamlessY: false, density).Collect(0, Size.Height - 1, second);
 
         Assert.NotEmpty(first);
         Assert.Equal(first, second);

@@ -69,6 +69,26 @@ public sealed class StarCellFieldTests
     }
 
     [Fact]
+    public void Collect_WhenSeamlessVertically_CopiesTheBottomRowsAboveTheTop()
+    {
+        var wrapped = new StarCellField(Layer(), Size, 1UL, 0, seamlessX: false, seamlessY: true);
+        var plain = new StarCellField(Layer(), Size, 1UL, 0, seamlessX: false, seamlessY: false);
+
+        var top = Collect(wrapped, 0, 5);
+        var bottom = Collect(wrapped, Size.Height - 70, Size.Height - 1);
+        List<Star> above = [.. top.Where(star => star.Y < 0.0f)];
+
+        Assert.NotEmpty(above);
+        Assert.All(above, star => Assert.Contains(bottom, twin =>
+            MathF.Abs(twin.Y - (star.Y + Size.Height)) < 1e-3f && twin.X == star.X && twin.Emission == star.Emission));
+
+        // Without wrapping, the ring above the image holds stars of its own rather than copies.
+        List<Star> plainAbove = [.. Collect(plain, 0, 5).Where(star => star.Y < 0.0f)];
+        var plainBottom = Collect(plain, Size.Height - 70, Size.Height - 1);
+        Assert.Contains(plainAbove, star => !plainBottom.Any(twin => MathF.Abs(twin.Y - (star.Y + Size.Height)) < 1e-3f));
+    }
+
+    [Fact]
     public void Collect_WithZeroDensity_ProducesNothing()
     {
         var field = Field(density: 0.0f);

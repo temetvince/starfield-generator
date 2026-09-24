@@ -98,6 +98,40 @@ public sealed class NoiseTests
     }
 
     [Fact]
+    public void FractalNoise_WithAVerticalPeriod_MatchesAcrossTheTopAndBottom()
+    {
+        const float Aspect = 0.5625f;
+        var noise = new FractalNoise(9UL, new FractalNoiseOptions { SeamlessX = true, VerticalPeriod = Aspect, Octaves = 6 });
+
+        for (var x = 0.0f; x < 1.0f; x += 0.017f)
+        {
+            Assert.Equal(noise.Sample(x, 0.0f), noise.Sample(x, Aspect), 1e-4f);
+        }
+    }
+
+    [Fact]
+    public void FractalNoise_WithoutAVerticalPeriod_DiffersAcrossTheTopAndBottom()
+    {
+        var noise = new FractalNoise(9UL, new FractalNoiseOptions { SeamlessX = true, Octaves = 6 });
+
+        var difference = 0.0f;
+        for (var x = 0.0f; x < 1.0f; x += 0.017f)
+        {
+            difference += MathF.Abs(noise.Sample(x, 0.0f) - noise.Sample(x, 0.5625f));
+        }
+
+        Assert.True(difference > 0.1f, "A field with no vertical period should not line up top to bottom.");
+    }
+
+    [Fact]
+    public void FractalNoiseOptions_RejectANegativeVerticalPeriod()
+    {
+        var problems = new FractalNoiseOptions { VerticalPeriod = -1.0f }.Validate();
+
+        Assert.Contains(problems, problem => problem.Contains("VerticalPeriod", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void FractalNoise_IsReproducibleForTheSameSeed()
     {
         var options = new FractalNoiseOptions { Octaves = 4 };

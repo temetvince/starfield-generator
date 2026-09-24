@@ -1,4 +1,4 @@
-﻿# Starfield Generator
+# Starfield Generator
 
 A .NET 10 command-line tool that renders star fields and nebulae as PNG files, at any size you can
 store. It was built for wide parallax backdrops — 10000×1080 is the size it was tuned against — and it
@@ -50,9 +50,10 @@ Each image is built from a nebula layer, a haze layer and several star layers, c
 
 Two behaviours are worth knowing about:
 
-- **Seamless by default.** The left and right edges join exactly, so the image loops as a scrolling
-  backdrop. Stars that straddle the seam are drawn on both sides, and every noise field wraps to a whole
-  number of cells. Turn it off with `--no-seamless`.
+- **Seamless by default.** All four edges join exactly, so the image is a tile that repeats in both
+  directions and loops as a scrolling backdrop. Stars that straddle a seam are drawn on both sides, and
+  every noise field wraps to a whole number of cells. Turn off the sides with `--no-seamless` and the
+  top and bottom with `--no-seamless-y`.
 - **Reproducible always.** The same seed and options produce the same image, byte for byte, on any
   machine, at any band size and any thread count.
 

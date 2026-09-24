@@ -120,6 +120,20 @@ public sealed class RenderRequestViewModelTests
         Assert.Equal("#00FF00", form.RampStops[^1]);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Build_PassesTheVerticalTilingChoiceThrough(bool tile)
+    {
+        var form = new RenderRequestViewModel { TileVertically = tile };
+
+        var built = form.Build();
+
+        Assert.True(built.IsValid);
+        Assert.Equal(tile, built.Options!.SeamlessY);
+        Assert.True(built.Options.SeamlessX);
+    }
+
     [Fact]
     public void RandomiseSeed_ProducesAParsableSeedThatChanges()
     {

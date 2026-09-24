@@ -74,6 +74,47 @@ public sealed class StarfieldRendererTests
     }
 
     [Fact]
+    public void Render_WhenSeamlessVertically_JoinsAsSmoothlyAsAnyNeighbouringRows()
+    {
+        var nebulaOnly = SmallField with { StarLayers = [], DitherStrength = 0.0f };
+
+        var seamless = DecodedPng.Decode(Render(nebulaOnly with { SeamlessY = true }));
+        var plain = DecodedPng.Decode(Render(nebulaOnly with { SeamlessY = false }));
+
+        var seam = RowDifference(seamless, seamless.Height - 1, 0);
+        var neighbours = RowDifference(seamless, 0, 1);
+        var unwrapped = RowDifference(plain, plain.Height - 1, 0);
+
+        Assert.True(
+            seam <= (neighbours * 2.0) + 1.0,
+            $"The seam differed by {seam:F2} where neighbouring rows differ by {neighbours:F2}.");
+
+        Assert.True(
+            unwrapped > seam * 1.5,
+            $"Without wrapping the seam differed by only {unwrapped:F2} against {seam:F2} with it.");
+    }
+
+    [Fact]
+    public void Render_WhenSeamlessBothWays_StarsMatchAcrossTheTopAndBottom()
+    {
+        // Stars only, with the band switched off, so the comparison is between the star copies alone.
+        var starsOnly = SmallField with
+        {
+            Nebula = SmallField.Nebula with { Enabled = false },
+            Clustering = SmallField.Clustering with { Enabled = false },
+            DitherStrength = 0.0f,
+            SeamlessY = true,
+        };
+
+        var image = DecodedPng.Decode(Render(starsOnly));
+
+        var seam = RowDifference(image, image.Height - 1, 0);
+        var neighbours = RowDifference(image, 0, 1);
+
+        Assert.True(seam <= (neighbours * 2.0) + 1.0, $"Stars did not carry across the seam: {seam:F2} vs {neighbours:F2}.");
+    }
+
+    [Fact]
     public void RenderLayerFiles_WritesOneTransparentFilePerLayer()
     {
         var options = SmallField;
@@ -207,6 +248,26 @@ public sealed class StarfieldRendererTests
         }
 
         return total / (image.Height * 3);
+    }
+
+    /// <summary>Measures how far apart two rows are, per channel.</summary>
+    /// <param name="image">The decoded image.</param>
+    /// <param name="upper">One row index.</param>
+    /// <param name="lower">The other row index.</param>
+    /// <returns>The mean absolute channel difference between the two rows.</returns>
+    private static double RowDifference(DecodedPng image, int upper, int lower)
+    {
+        var total = 0.0;
+
+        for (var x = 0; x < image.Width; x++)
+        {
+            for (var channel = 0; channel < 3; channel++)
+            {
+                total += Math.Abs(image.GetChannel(x, upper, channel) - image.GetChannel(x, lower, channel));
+            }
+        }
+
+        return total / (image.Width * 3);
     }
 
     private static byte[] Render(StarfieldOptions options)

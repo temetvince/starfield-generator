@@ -66,11 +66,11 @@ public sealed class StarfieldRenderer
 
         // One clustering field is shared by every layer, so the whole sky agrees on where the galactic
         // band and the star clouds are.
-        var density = new StarDensityField(_options.Clustering, _options.Size, _options.Seed, _options.SeamlessX);
+        var density = new StarDensityField(_options.Clustering, _options.Size, _options.Seed, _options.SeamlessX, _options.SeamlessY);
 
         if (_options.Nebula.Enabled)
         {
-            var nebula = new NebulaLayerRenderer(_options.Nebula, _options.Seed, _options.SeamlessX, density);
+            var nebula = new NebulaLayerRenderer(_options.Nebula, _options.Size, _options.Seed, _options.SeamlessX, _options.SeamlessY, density);
             Log.NebulaPaletteChosen(_logger, _options.Seed, nebula.PaletteName, nebula.HueShift);
             layers.Add(nebula);
         }
@@ -88,6 +88,7 @@ public sealed class StarfieldRenderer
                 _options.Seed,
                 index,
                 _options.SeamlessX,
+                _options.SeamlessY,
                 density));
         }
 

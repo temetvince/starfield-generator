@@ -19,6 +19,7 @@ public sealed class CliCommandLineTests
         Height = 1024,
         Seed = 18446744073709551615UL,
         SeamlessX = false,
+        SeamlessY = true,
         Exposure = 1.25f,
         Background = "#02030A",
         NebulaEnabled = false,

@@ -66,6 +66,10 @@ public sealed record CliArguments
     /// <value><see langword="null"/> to keep the baseline setting.</value>
     public bool? SeamlessX { get; init; }
 
+    /// <summary>Gets the vertical-tiling override.</summary>
+    /// <value><see langword="null"/> to keep the baseline setting.</value>
+    public bool? SeamlessY { get; init; }
+
     /// <summary>Gets the exposure override.</summary>
     /// <value><see langword="null"/> to keep the baseline exposure.</value>
     public float? Exposure { get; init; }
@@ -108,6 +112,7 @@ public sealed record CliArguments
             Height = Height ?? baseline.Height,
             Seed = Seed ?? baseline.Seed,
             SeamlessX = SeamlessX ?? baseline.SeamlessX,
+            SeamlessY = SeamlessY ?? baseline.SeamlessY,
             Exposure = Exposure ?? baseline.Exposure,
             Background = Background ?? baseline.Background,
             MaxDegreeOfParallelism = Threads ?? baseline.MaxDegreeOfParallelism,

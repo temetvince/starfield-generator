@@ -52,6 +52,7 @@ public sealed class StarCellField
     private readonly ulong _seed;
     private readonly int _layerIndex;
     private readonly bool _seamlessX;
+    private readonly bool _seamlessY;
     private readonly int _cellsX;
     private readonly int _cellsY;
     private readonly float _cellWidth;
@@ -75,6 +76,10 @@ public sealed class StarCellField
     /// <see langword="true"/> to emit a wrapped copy of any star whose reach crosses an image edge, so
     /// the seam has no gap.
     /// </param>
+    /// <param name="seamlessY">
+    /// <see langword="true"/> to make the field repeat every image height: cell rows beyond the top or
+    /// bottom edge yield exact copies of the rows at the other edge, shifted by the image height.
+    /// </param>
     /// <param name="density">
     /// The clustering field that gathers stars into a band and clouds, or <see langword="null"/> to
     /// spread the layer evenly.
@@ -86,6 +91,7 @@ public sealed class StarCellField
         ulong seed,
         int layerIndex,
         bool seamlessX,
+        bool seamlessY = false,
         StarDensityField? density = null)
     {
         ArgumentNullException.ThrowIfNull(layer);
@@ -95,6 +101,7 @@ public sealed class StarCellField
         _seed = Hash64.Combine(seed, (ulong)layerIndex);
         _layerIndex = layerIndex;
         _seamlessX = seamlessX;
+        _seamlessY = seamlessY;
 
         _cellsX = Math.Max(1, (int)MathF.Round(image.Width / TargetCellSize));
         _cellsY = Math.Max(1, (int)MathF.Round(image.Height / TargetCellSize));
@@ -151,20 +158,34 @@ public sealed class StarCellField
         var firstCellY = (int)MathF.Floor((firstRow - margin) / _cellHeight);
         var lastCellY = (int)MathF.Floor((lastRow + margin) / _cellHeight);
 
-        // One ring of cells beyond the image keeps edge glow intact without inventing stars far outside.
-        firstCellY = Math.Max(firstCellY, -1);
-        lastCellY = Math.Min(lastCellY, _cellsY);
+        if (!_seamlessY)
+        {
+            // One ring of cells beyond the image keeps edge glow intact without inventing stars far outside.
+            firstCellY = Math.Max(firstCellY, -1);
+            lastCellY = Math.Min(lastCellY, _cellsY);
+        }
 
         for (var cellY = firstCellY; cellY <= lastCellY; cellY++)
         {
+            // On a tile that repeats vertically, a cell row beyond the image is the matching row from
+            // the other edge, shifted by a whole image height, so its stars are exact copies.
+            var sourceCellY = _seamlessY ? WrapCell(cellY, _cellsY) : cellY;
+            var yOffset = (cellY - sourceCellY) * _cellHeight;
+
             for (var cellX = 0; cellX < _cellsX; cellX++)
             {
-                CollectCell(cellX, cellY, firstRow, lastRow, destination);
+                CollectCell(cellX, sourceCellY, yOffset, firstRow, lastRow, destination);
             }
         }
     }
 
-    private void CollectCell(int cellX, int cellY, int firstRow, int lastRow, List<Star> destination)
+    private static int WrapCell(int cell, int count)
+    {
+        var wrapped = cell % count;
+        return wrapped < 0 ? wrapped + count : wrapped;
+    }
+
+    private void CollectCell(int cellX, int cellY, float yOffset, int firstRow, int lastRow, List<Star> destination)
     {
         var random = new DeterministicRandom(Hash64.Combine(_seed, _layerIndex, cellX, cellY));
 
@@ -191,7 +212,7 @@ public sealed class StarCellField
                 continue;
             }
 
-            var star = BuildStar(x, y, brightness, radiusJitter, temperature, angleJitter);
+            var star = BuildStar(x, y + yOffset, brightness, radiusJitter, temperature, angleJitter);
 
             // Rows are shaded at their centres, so the star reaches rows in
             // [Y - reach - 0.5, Y + reach - 0.5]. Overlap is tested against that, not against Y alone.

@@ -43,6 +43,7 @@ public sealed class StarLayerRenderer : ILayerRenderer
     /// <param name="seed">The field's seed.</param>
     /// <param name="layerIndex">This layer's position in the field.</param>
     /// <param name="seamlessX"><see langword="true"/> to wrap stars across the left and right edges.</param>
+    /// <param name="seamlessY"><see langword="true"/> to make the layer tile vertically as well.</param>
     /// <param name="density">
     /// The clustering field shared by every layer, or <see langword="null"/> to spread this layer
     /// evenly.
@@ -54,12 +55,13 @@ public sealed class StarLayerRenderer : ILayerRenderer
         ulong seed,
         int layerIndex,
         bool seamlessX,
+        bool seamlessY = false,
         StarDensityField? density = null)
     {
         ArgumentNullException.ThrowIfNull(layer);
 
         _layer = layer;
-        _field = new StarCellField(layer, image, seed, layerIndex, seamlessX, density);
+        _field = new StarCellField(layer, image, seed, layerIndex, seamlessX, seamlessY, density);
     }
 
     /// <inheritdoc/>

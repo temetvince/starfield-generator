@@ -31,11 +31,16 @@ public sealed class TilingPerlinNoise(ulong seed)
     /// disable wrapping. Wrapping only holds if the caller also scales <paramref name="x"/> so that the
     /// image width spans exactly this many cells.
     /// </param>
+    /// <param name="periodY">
+    /// The number of lattice cells after which the field repeats vertically, or zero for no vertical
+    /// repeat. A period of one is legal and gives a field with no vertical variation between rows of
+    /// lattice points, which still joins seamlessly.
+    /// </param>
     /// <returns>
     /// A value in roughly <c>[-1, 1]</c>. Two-dimensional gradient noise rarely reaches the extremes,
     /// so the practical range is nearer <c>[-0.9, 0.9]</c>.
     /// </returns>
-    public float Sample(float x, float y, int periodX)
+    public float Sample(float x, float y, int periodX, int periodY = 0)
     {
         var x0 = (int)MathF.Floor(x);
         var y0 = (int)MathF.Floor(y);
@@ -50,6 +55,11 @@ public sealed class TilingPerlinNoise(ulong seed)
         }
 
         var y1 = y0 + 1;
+        if (periodY >= 1)
+        {
+            y0 = Wrap(y0, periodY);
+            y1 = Wrap(y1, periodY);
+        }
 
         var u = Fade(fx);
         var v = Fade(fy);

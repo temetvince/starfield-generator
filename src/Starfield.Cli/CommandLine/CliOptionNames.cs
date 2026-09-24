@@ -42,6 +42,12 @@ public static class CliOptionNames
     /// <summary>Do not wrap the edges.</summary>
     public const string NoSeamless = "--no-seamless";
 
+    /// <summary>Make the top and bottom edges join as well.</summary>
+    public const string SeamlessY = "--seamless-y";
+
+    /// <summary>Do not wrap the top and bottom.</summary>
+    public const string NoSeamlessY = "--no-seamless-y";
+
     /// <summary>The composite PNG to write.</summary>
     public const string Out = "--out";
 

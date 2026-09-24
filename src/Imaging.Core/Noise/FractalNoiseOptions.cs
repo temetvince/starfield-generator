@@ -57,6 +57,15 @@ public sealed record FractalNoiseOptions
     /// </value>
     public bool SeamlessX { get; init; } = true;
 
+    /// <summary>Gets the distance along y at which the field repeats, in the same units as x.</summary>
+    /// <value>
+    /// Zero, the default, for no vertical repeat. A positive value makes every octave wrap after a
+    /// whole number of lattice cells that spans this distance, with the cells stretched by at most
+    /// half a cell to make the count whole. A renderer that samples in turns of the image width passes
+    /// the image's height divided by its width.
+    /// </value>
+    public float VerticalPeriod { get; init; }
+
     /// <summary>Reports why these options cannot be used, if they cannot.</summary>
     /// <returns>A human-readable list of problems, empty when the options are valid.</returns>
     public IReadOnlyList<string> Validate()
@@ -81,6 +90,11 @@ public sealed record FractalNoiseOptions
         if (Gain is <= 0.0f or > 1.0f)
         {
             problems.Add(Invariant($"Gain must be in (0, 1] but was {Gain}."));
+        }
+
+        if (!(VerticalPeriod >= 0.0f))
+        {
+            problems.Add(Invariant($"VerticalPeriod must not be negative but was {VerticalPeriod}."));
         }
 
         return problems;

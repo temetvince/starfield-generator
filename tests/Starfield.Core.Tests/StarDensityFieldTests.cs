@@ -33,6 +33,23 @@ public sealed class StarDensityFieldTests
     }
 
     [Fact]
+    public void Sample_WhenSeamlessVertically_RepeatsEveryImageHeight()
+    {
+        var options = new StarClusteringOptions { BandCentre = 0.46f, BandWidth = 0.22f, BandWobble = 0.2f };
+        var wrapped = new StarDensityField(options, Size, 5UL, seamlessX: true, seamlessY: true);
+        var plain = new StarDensityField(options, Size, 5UL, seamlessX: true, seamlessY: false);
+
+        for (var x = 25.0f; x < Size.Width; x += 173.0f)
+        {
+            Assert.Equal(wrapped.SampleBand(x, 300.0f), wrapped.SampleBand(x, 300.0f + Size.Height), 1e-3f);
+            Assert.Equal(wrapped.Sample(x, 300.0f), wrapped.Sample(x, 300.0f + Size.Height), 1e-3f);
+        }
+
+        // Without wrapping, a row one image height below the band is far from it rather than on it.
+        Assert.True(plain.SampleBand(1000.0f, 300.0f) > plain.SampleBand(1000.0f, 1300.0f) * 10.0f);
+    }
+
+    [Fact]
     public void Sample_NeverExceedsTheCeilingItAdvertises()
     {
         // Star placement samples against this ceiling, so an underestimate would silently clip the

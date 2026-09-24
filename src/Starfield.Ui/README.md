@@ -14,7 +14,9 @@ dotnet run --project src/Starfield.Ui
 Choose where to save, optionally a width, height and seed, and press Render. The image is rendered in
 this process by the same library the command line uses. The preview area shows a loader while it
 runs, then the finished picture, with where it was saved as a caption. Blank fields use the defaults,
-a 4K image from seed 1, shown greyed inside each field. The Random seed button picks a new sky.
+a 4K image from seed 1, shown greyed inside each field. The Random seed button picks a new sky. The
+left and right edges always join. Tile vertically, ticked by default, makes the top and bottom join
+too, for a texture that repeats both ways; untick it for a plain top and bottom.
 
 By default each seed picks one of the built-in nebula palettes. Tick Custom nebula colours to choose a
 rim colour and a core colour instead; the swatch beside the pickers shows the ramp the clouds will be

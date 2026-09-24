@@ -1,4 +1,4 @@
-﻿# Starfield.Cli
+# Starfield.Cli
 
 The executable, named `starfield`. It parses arguments, loads and saves presets, sets up console
 logging, and hands the work to [`Starfield.Core`](../Starfield.Core/README.md). It contains no rendering
@@ -31,6 +31,7 @@ logic.
 | `--exposure <n>` | `-e` | Brightness multiplier applied before tone mapping. |
 | `--background <hex>` | `-b` | Background colour, such as `#02030A`. |
 | `--seamless`, `--no-seamless` | | Whether the left and right edges join. Seamless is the default. |
+| `--seamless-y`, `--no-seamless-y` | | Whether the top and bottom edges join as well, for a tile that repeats both ways. On by default. |
 | `--nebula`, `--no-nebula` | | Whether the nebula is rendered. On by default. |
 | `--preset <file>` | | Load all settings from JSON, then apply any other options on top. |
 | `--dump-preset <file>` | | Write the settings that would be used, then exit without rendering. |

@@ -1,4 +1,5 @@
 ﻿using Imaging.Core.Colors;
+using Imaging.Core.Rendering;
 using Imaging.TestSupport;
 using Starfield.Core.Options;
 using Starfield.Core.Rendering;
@@ -8,6 +9,7 @@ namespace Starfield.Core.Tests;
 /// <summary>Checks the parts of the nebula renderer that depend on the seed beyond the noise fields.</summary>
 public sealed class NebulaLayerRendererTests
 {
+    private static readonly ImageSize TestSize = new(160, 96);
     private static readonly NebulaPaletteOptions Blue = Solid("blue", "#0000FF");
     private static readonly NebulaPaletteOptions Red = Solid("red", "#FF0000");
 
@@ -35,7 +37,7 @@ public sealed class NebulaLayerRendererTests
         var options = new NebulaOptions();
 
         var distinct = Enumerable.Range(1, 32)
-            .Select(seed => new NebulaLayerRenderer(options, (ulong)seed, seamlessX: true).PaletteName)
+            .Select(seed => new NebulaLayerRenderer(options, TestSize, (ulong)seed, seamlessX: true).PaletteName)
             .Distinct()
             .Count();
 
@@ -47,8 +49,8 @@ public sealed class NebulaLayerRendererTests
     {
         var options = new NebulaOptions();
 
-        var first = new NebulaLayerRenderer(options, 99UL, seamlessX: true);
-        var second = new NebulaLayerRenderer(options, 99UL, seamlessX: false);
+        var first = new NebulaLayerRenderer(options, TestSize, 99UL, seamlessX: true);
+        var second = new NebulaLayerRenderer(options, TestSize, 99UL, seamlessX: false);
 
         Assert.Equal(first.PaletteName, second.PaletteName);
         Assert.Equal(first.HueShift, second.HueShift);
@@ -63,7 +65,7 @@ public sealed class NebulaLayerRendererTests
 
         for (var seed = 1UL; seed <= 64UL; seed++)
         {
-            Assert.InRange(new NebulaLayerRenderer(options, seed, seamlessX: true).HueShift, -variation / 2.0f, variation / 2.0f);
+            Assert.InRange(new NebulaLayerRenderer(options, TestSize, seed, seamlessX: true).HueShift, -variation / 2.0f, variation / 2.0f);
         }
     }
 
@@ -74,7 +76,7 @@ public sealed class NebulaLayerRendererTests
 
         for (var seed = 1UL; seed <= 16UL; seed++)
         {
-            Assert.Equal(0.0f, new NebulaLayerRenderer(options, seed, seamlessX: true).HueShift);
+            Assert.Equal(0.0f, new NebulaLayerRenderer(options, TestSize, seed, seamlessX: true).HueShift);
         }
     }
 
@@ -112,7 +114,7 @@ public sealed class NebulaLayerRendererTests
         // staying deterministic rather than on luck.
         var seed = Enumerable.Range(1, 64)
             .Select(candidate => (ulong)candidate)
-            .First(candidate => MathF.Abs(new NebulaLayerRenderer(options.Nebula, candidate, seamlessX: true).HueShift) > 0.15f);
+            .First(candidate => MathF.Abs(new NebulaLayerRenderer(options.Nebula, TestSize, candidate, seamlessX: true).HueShift) > 0.15f);
 
         var image = Render(options with { Seed = seed });
 
@@ -128,7 +130,7 @@ public sealed class NebulaLayerRendererTests
     private static ulong FirstSeedChoosing(NebulaOptions options, string palette)
         => Enumerable.Range(1, 64)
             .Select(candidate => (ulong)candidate)
-            .First(candidate => new NebulaLayerRenderer(options, candidate, seamlessX: true).PaletteName == palette);
+            .First(candidate => new NebulaLayerRenderer(options, TestSize, candidate, seamlessX: true).PaletteName == palette);
 
     private static bool HasAnyLight(DecodedPng image, int channel)
     {

@@ -9,7 +9,7 @@ as plain objects.
 
 | Area | Types | Purpose |
 | --- | --- | --- |
-| `ViewModels/RenderRequestViewModel.cs` | `RenderRequestViewModel`, `RequestDefaults`, `RequestBuildResult` | The form: output path, width, height, seed and optional rim and core colours, and `Build()` which turns it into `StarfieldOptions` or a list of problems. |
+| `ViewModels/RenderRequestViewModel.cs` | `RenderRequestViewModel`, `RequestDefaults`, `RequestBuildResult` | The form: output path, width, height, seed, vertical tiling and optional rim and core colours, and `Build()` which turns it into `StarfieldOptions` or a list of problems. |
 | `ViewModels/MainViewModel.cs` | `MainViewModel` | The window state: the form, the render in progress, the finished image's path, what the preview area shows, and the backdrop. |
 | `Rendering/` | `IRenderService`, `StarfieldRenderService`, `Backdrop` | Rendering on a worker thread with the library, to a file or to memory, with progress forwarded to the window. |
 | `Mvvm/` | `ObservableObject`, `RelayCommand`, `AsyncRelayCommand` | The few binding primitives the view models need. |

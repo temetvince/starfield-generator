@@ -166,6 +166,18 @@ public sealed class CliParserTests
         Assert.Empty(CliParser.Parse(["--background", "#123456"]).ValidateOverrides());
     }
 
+    [Theory]
+    [InlineData("--seamless-y", true)]
+    [InlineData("--no-seamless-y", false)]
+    public void Parse_ReadsTheVerticalTilingSwitch(string option, bool expected)
+    {
+        var parsed = CliParser.Parse([option]);
+
+        Assert.Empty(parsed.Errors);
+        Assert.Equal(expected, parsed.SeamlessY);
+        Assert.Null(parsed.SeamlessX);
+    }
+
     [Fact]
     public void Parse_WithoutArguments_Throws()
         => Assert.Throws<ArgumentNullException>(() => CliParser.Parse(null!));
@@ -178,7 +190,7 @@ public sealed class CliParserTests
         foreach (var option in new[]
         {
             "--out", "--layers", "--width", "--height", "--seed", "--exposure", "--background",
-            "--seamless", "--no-seamless", "--nebula", "--no-nebula", "--preset", "--dump-preset",
+            "--seamless", "--no-seamless", "--seamless-y", "--no-seamless-y", "--nebula", "--no-nebula", "--preset", "--dump-preset",
             "--threads", "--band-height", "--memory", "--compression", "--verbose", "--quiet", "--help",
         })
         {

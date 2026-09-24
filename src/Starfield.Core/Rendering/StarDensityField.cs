@@ -30,6 +30,7 @@ public sealed class StarDensityField
 
     private readonly StarClusteringOptions _options;
     private readonly ImageSize _image;
+    private readonly bool _seamlessY;
     private readonly FractalNoise _clumping;
     private readonly FractalNoise _wobble;
     private readonly FractalNoise _dust;
@@ -45,16 +46,28 @@ public sealed class StarDensityField
     /// <see langword="true"/> to wrap the noise fields to the image width, so the clustering joins
     /// across the seam.
     /// </param>
+    /// <param name="seamlessY">
+    /// <see langword="true"/> to make the field repeat every image height as well: the noise wraps
+    /// vertically and the band's distance is measured around the tile, so it becomes a ring.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="options"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">The clumping noise options are not valid.</exception>
-    public StarDensityField(StarClusteringOptions options, ImageSize image, ulong seed, bool seamlessX)
+    public StarDensityField(StarClusteringOptions options, ImageSize image, ulong seed, bool seamlessX, bool seamlessY = false)
     {
         ArgumentNullException.ThrowIfNull(options);
 
         _options = options;
         _image = image;
-        _clumping = new FractalNoise(Hash64.Combine(seed, 201UL), options.Clumping with { SeamlessX = seamlessX });
-        _dust = new FractalNoise(Hash64.Combine(seed, 203UL), options.Dust with { SeamlessX = seamlessX });
+        _seamlessY = seamlessY;
+
+        // Noise is sampled in turns of the image width, so the vertical period is the aspect ratio.
+        var verticalPeriod = seamlessY ? (float)image.Height / image.Width : 0.0f;
+        _clumping = new FractalNoise(
+            Hash64.Combine(seed, 201UL),
+            options.Clumping with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
+        _dust = new FractalNoise(
+            Hash64.Combine(seed, 203UL),
+            options.Dust with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
         _wobble = new FractalNoise(
             Hash64.Combine(seed, 202UL),
             new FractalNoiseOptions
@@ -64,6 +77,7 @@ public sealed class StarDensityField
                 Gain = 0.5f,
                 Shape = FractalNoiseShape.Brownian,
                 SeamlessX = seamlessX,
+                VerticalPeriod = verticalPeriod,
             });
 
         _bandCentrePixels = options.BandCentre * image.Height;
@@ -93,7 +107,16 @@ public sealed class StarDensityField
         }
 
         var centre = _bandCentrePixels + (((_wobble.Sample(x / _image.Width, 0.0f) * 2.0f) - 1.0f) * _wobblePixels);
-        var offset = (y - centre) / _bandWidthPixels;
+        var offset = y - centre;
+
+        // On a tile that repeats vertically the band is a ring: distance is measured the short way
+        // round, so the rows just above the top edge see the band just below the bottom edge.
+        if (_seamlessY)
+        {
+            offset -= _image.Height * MathF.Round(offset / _image.Height);
+        }
+
+        offset /= _bandWidthPixels;
         return MathF.Exp(-offset * offset);
     }
 

@@ -35,11 +35,13 @@ public sealed class NebulaLayerRenderer : ILayerRenderer
     /// The cloud settings. Must already have passed validation; the noise fields reject bad shapes
     /// themselves.
     /// </param>
+    /// <param name="image">The image the clouds are drawn into, whose aspect ratio sets the vertical repeat.</param>
     /// <param name="seed">The field's seed.</param>
     /// <param name="seamlessX">
     /// <see langword="true"/> to wrap every noise field to a whole number of cells across the image
     /// width, which makes the clouds tile horizontally.
     /// </param>
+    /// <param name="seamlessY"><see langword="true"/> to wrap every noise field to a whole number of cells down the image height as well.</param>
     /// <param name="density">
     /// The clustering field, so the clouds can gather onto the galactic band, or
     /// <see langword="null"/> to let them fall wherever the coverage field puts them.
@@ -49,8 +51,10 @@ public sealed class NebulaLayerRenderer : ILayerRenderer
     /// <exception cref="ArgumentException">One of the noise fields is not valid.</exception>
     public NebulaLayerRenderer(
         NebulaOptions options,
+        ImageSize image,
         ulong seed,
         bool seamlessX,
+        bool seamlessY = false,
         StarDensityField? density = null,
         string name = "nebula")
     {
@@ -61,10 +65,12 @@ public sealed class NebulaLayerRenderer : ILayerRenderer
         _density = density;
         Name = name;
 
-        _coverage = new FractalNoise(Hash64.Combine(seed, 101UL), options.Coverage with { SeamlessX = seamlessX });
-        _structure = new FractalNoise(Hash64.Combine(seed, 102UL), options.Structure with { SeamlessX = seamlessX });
-        _warpX = new FractalNoise(Hash64.Combine(seed, 103UL), options.Warp with { SeamlessX = seamlessX });
-        _warpY = new FractalNoise(Hash64.Combine(seed, 104UL), options.Warp with { SeamlessX = seamlessX });
+        // Noise is sampled in turns of the image width, so the vertical period is the aspect ratio.
+        var verticalPeriod = seamlessY ? (float)image.Height / image.Width : 0.0f;
+        _coverage = new FractalNoise(Hash64.Combine(seed, 101UL), options.Coverage with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
+        _structure = new FractalNoise(Hash64.Combine(seed, 102UL), options.Structure with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
+        _warpX = new FractalNoise(Hash64.Combine(seed, 103UL), options.Warp with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
+        _warpY = new FractalNoise(Hash64.Combine(seed, 104UL), options.Warp with { SeamlessX = seamlessX, VerticalPeriod = verticalPeriod });
 
         // Each seed picks one authored palette, then nudges its hues a little. Choosing from a list is
         // what keeps every seed on a ramp a person judged to look good, while the nudge keeps two seeds

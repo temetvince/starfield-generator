@@ -22,6 +22,7 @@ public static class Backdrop
         Height = Height,
         Seed = seed,
         SeamlessX = false,
+        SeamlessY = false,
         Exposure = 0.7f,
     };
 }
