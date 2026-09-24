@@ -16,6 +16,10 @@ this process by the same library the command line uses. The preview area shows a
 runs, then the finished picture, with where it was saved as a caption. Blank fields use the defaults,
 a 4K image from seed 1, shown greyed inside each field. The Random seed button picks a new sky.
 
+By default each seed picks one of the built-in nebula palettes. Tick Custom nebula colours to choose a
+rim colour and a core colour instead; the swatch beside the pickers shows the ramp the clouds will be
+painted with, and every seed then keeps that colour and varies only the shapes.
+
 ## The look
 
 The window is always dark. Behind the cards is a real star field, rendered with a random seed each time
@@ -29,4 +33,5 @@ and a violet accent marks the one button that matters.
 | `Program.cs` | Entry point and Avalonia configuration. |
 | `App.axaml`, `App.axaml.cs` | Loads the Fluent theme in its dark variant and builds the `MainViewModel`. |
 | `MainWindow.axaml` | The styles and layout: a settings bar across the top, the preview filling the rest. |
-| `MainWindow.axaml.cs` | The save dialog and loading the backdrop and preview bitmaps. |
+| `MainWindow.axaml.cs` | The save dialog, loading the backdrop and preview bitmaps, and painting the ramp swatch. |
+| `Converters/HexColorConverter.cs` | Binds the pickers' colours to the form's hex text. |

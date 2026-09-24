@@ -25,7 +25,7 @@ position, and dithering is keyed to absolute image coordinates.
 | --- | --- | --- |
 | `Png/` | `PngStreamWriter`, `PngColorType`, `Crc32` | Row-at-a-time PNG encoder with adaptive filtering and chunked IDAT output. |
 | `Noise/` | `TilingPerlinNoise`, `FractalNoise`, `FractalNoiseOptions`, `FractalNoiseShape` | Gradient noise that can repeat exactly across a chosen period. |
-| `Colors/` | `LinearRgb`, `Oklab`, `Srgb`, `Blackbody`, `ColorGradient`, `HexColor`, `ToneMapper` | Linear-light colour type and the conversions around it. |
+| `Colors/` | `LinearRgb`, `Oklab`, `Oklch`, `Srgb`, `Blackbody`, `ColorGradient`, `HexColor`, `ToneMapper` | Linear-light colour type and the conversions around it. |
 | `Numerics/` | `Hash64`, `DeterministicRandom`, `Interpolation` | Reproducible hashing, a small seeded generator, and blending helpers. |
 | `Rendering/` | `BandedImageRenderer`, `ILayerRenderer`, `RgbBandBuffer`, `BandRegion`, `ImageSize`, `BandEncoder`, `BandedRenderOptions`, `ImageEncodingOptions` | The band loop and the pipeline from accumulated light to stored bytes. |
 | `Log.cs` | `Log` | Source-generated log messages. |

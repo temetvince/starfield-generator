@@ -130,7 +130,9 @@ Colour is chosen per seed from `Palettes`, a list of named, hand-authored ramps.
 palette, then nudges its hues by up to half of `HueVariation` either way, so two seeds that draw the
 same palette still differ a little. The nudge is a perceptual rotation through `Oklab`, which keeps a
 soft colour soft at every hue. Listing a single palette pins every seed to that ramp; `NebulaPalettes`
-holds the shipped set, which deliberately leaves out muddy yellow-greens.
+holds the shipped set, which deliberately leaves out muddy yellow-greens. `NebulaPalettes.Between`
+builds a palette from just two colours, a rim and a core, blending between them in `Oklch` so the hue
+takes the short way round the wheel and never dips through grey.
 
 `BandAffinity` then weights the coverage mask by the galactic band. Real nebulae lie in the galactic
 plane, and following it is what keeps the clouds and the star band reading as one structure instead of

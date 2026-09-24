@@ -139,6 +139,45 @@ public sealed class ColorTests
         }
     }
 
+    [Theory]
+    [InlineData(0.9f, 0.05f, 0.1f)]
+    [InlineData(0.1f, 0.2f, 0.6f)]
+    [InlineData(0.5f, 0.0f, 0.0f)]
+    public void Oklch_RoundTripsThroughOklab(float red, float green, float blue)
+    {
+        var colour = Oklab.FromLinear(new LinearRgb(red, green, blue));
+
+        var back = Oklch.FromOklab(colour).ToOklab();
+
+        Assert.Equal(colour.L, back.L, 4);
+        Assert.Equal(colour.A, back.A, 4);
+        Assert.Equal(colour.B, back.B, 4);
+    }
+
+    [Fact]
+    public void Oklch_Lerp_TakesTheShortWayRoundTheWheel()
+    {
+        var justBelowZero = new Oklch(0.5f, 0.1f, 0.95f);
+        var justAboveZero = new Oklch(0.5f, 0.1f, 0.05f);
+
+        var middle = Oklch.Lerp(justBelowZero, justAboveZero, 0.5f);
+
+        Assert.Equal(0.0f, middle.H, 3);
+    }
+
+    [Fact]
+    public void Oklch_Lerp_KeepsTheColourfulEndsHueWhenTheOtherIsGrey()
+    {
+        var grey = new Oklch(0.2f, 0.0f, 0.7f);
+        var orange = new Oklch(0.8f, 0.15f, 0.2f);
+
+        var quarter = Oklch.Lerp(grey, orange, 0.25f);
+
+        Assert.Equal(0.2f, quarter.H, 3);
+        Assert.Equal(0.35f, quarter.L, 3);
+        Assert.Equal(0.0375f, quarter.C, 3);
+    }
+
     [Fact]
     public void HexColor_RoundTripsThroughLinearLight()
     {

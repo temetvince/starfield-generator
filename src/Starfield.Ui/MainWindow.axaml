@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="using:Starfield.Ui.Converters"
         x:Class="Starfield.Ui.MainWindow"
         Title="Starfield Generator"
         Width="1180" Height="760" MinWidth="900" MinHeight="600"
@@ -8,6 +9,10 @@
   <Window.Background>
     <SolidColorBrush Color="#05060F" />
   </Window.Background>
+
+  <Window.Resources>
+    <converters:HexColorConverter x:Key="HexColor" />
+  </Window.Resources>
 
   <Window.Styles>
     <Style Selector="Border.card">
@@ -140,6 +145,15 @@
               <Button Classes="primary" Content="Render" Command="{Binding RenderCommand}" IsVisible="{Binding !IsRunning}" />
               <Button Classes="primary" Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding IsRunning}" />
             </Grid>
+          </Grid>
+
+          <Grid ColumnDefinitions="Auto,18,Auto,8,Auto,16,Auto,8,Auto,18,*" Margin="0,14,0,0">
+            <CheckBox Grid.Column="0" Content="Custom nebula colours" IsChecked="{Binding Request.UseCustomColours}" VerticalAlignment="Center" ToolTip.Tip="Off: each seed picks one of the built-in palettes. On: blend from the rim colour to the core colour." />
+            <TextBlock Grid.Column="2" Classes="label" Margin="0" Text="Rim" VerticalAlignment="Center" ToolTip.Tip="The colour of the faint outer edge of each cloud." />
+            <ColorPicker Grid.Column="4" Color="{Binding Request.RimColour, Mode=TwoWay, Converter={StaticResource HexColor}}" IsEnabled="{Binding Request.UseCustomColours}" IsAlphaEnabled="False" IsAlphaVisible="False" />
+            <TextBlock Grid.Column="6" Classes="label" Margin="0" Text="Core" VerticalAlignment="Center" ToolTip.Tip="The colour of the dense centre of each cloud." />
+            <ColorPicker Grid.Column="8" Color="{Binding Request.CoreColour, Mode=TwoWay, Converter={StaticResource HexColor}}" IsEnabled="{Binding Request.UseCustomColours}" IsAlphaEnabled="False" IsAlphaVisible="False" />
+            <Border Grid.Column="10" Name="RampSwatch" Height="30" CornerRadius="8" BorderBrush="#2E3560" BorderThickness="1" IsVisible="{Binding Request.UseCustomColours}" ToolTip.Tip="The ramp the nebula will be painted with, rim on the left, core on the right." />
           </Grid>
         </StackPanel>
       </Border>

@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using Imaging.Core.Colors;
 using Imaging.Core.Rendering;
 using Starfield.Core.Options;
 
@@ -171,6 +172,33 @@ public sealed class OptionsTests
         Assert.NotEmpty(shipped);
         Assert.All(shipped, palette => Assert.Empty(palette.Validate()));
         Assert.Equal(shipped.Count, shipped.Select(palette => palette.Name).Distinct().Count());
+    }
+
+    [Fact]
+    public void NebulaPalettes_Between_RunsFromRimToCoreThroughValidStops()
+    {
+        var rim = HexColor.Parse("#7A2A18");
+        var core = HexColor.Parse("#FFE8C0");
+
+        var palette = NebulaPalettes.Between("sunset", rim, core);
+
+        Assert.Equal("sunset", palette.Name);
+        Assert.Empty(palette.Validate());
+        Assert.Equal(5, palette.ColorStops.Count);
+        Assert.Equal(0.0f, palette.ColorStops[0].Position);
+        Assert.Equal(1.0f, palette.ColorStops[^1].Position);
+        Assert.Equal("#7A2A18", palette.ColorStops[0].Color);
+        Assert.Equal("#FFE8C0", palette.ColorStops[^1].Color);
+
+        var middle = HexColor.Parse(palette.ColorStops[2].Color);
+        Assert.True(middle.Luminance > rim.Luminance && middle.Luminance < core.Luminance);
+    }
+
+    [Fact]
+    public void NebulaPalettes_Between_RejectsABlankNameOrTooFewStops()
+    {
+        Assert.Throws<ArgumentException>(() => NebulaPalettes.Between(" ", LinearRgb.Black, LinearRgb.White));
+        Assert.Throws<ArgumentOutOfRangeException>(() => NebulaPalettes.Between("x", LinearRgb.Black, LinearRgb.White, 1));
     }
 
     [Fact]

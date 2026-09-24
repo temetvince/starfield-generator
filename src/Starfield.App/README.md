@@ -9,7 +9,7 @@ as plain objects.
 
 | Area | Types | Purpose |
 | --- | --- | --- |
-| `ViewModels/RenderRequestViewModel.cs` | `RenderRequestViewModel`, `RequestDefaults`, `RequestBuildResult` | The form: output path, width, height and seed, and `Build()` which turns it into `StarfieldOptions` or a list of problems. |
+| `ViewModels/RenderRequestViewModel.cs` | `RenderRequestViewModel`, `RequestDefaults`, `RequestBuildResult` | The form: output path, width, height, seed and optional rim and core colours, and `Build()` which turns it into `StarfieldOptions` or a list of problems. |
 | `ViewModels/MainViewModel.cs` | `MainViewModel` | The window state: the form, the render in progress, the finished image's path, what the preview area shows, and the backdrop. |
 | `Rendering/` | `IRenderService`, `StarfieldRenderService`, `Backdrop` | Rendering on a worker thread with the library, to a file or to memory, with progress forwarded to the window. |
 | `Mvvm/` | `ObservableObject`, `RelayCommand`, `AsyncRelayCommand` | The few binding primitives the view models need. |
@@ -17,7 +17,10 @@ as plain objects.
 ## How a click becomes an image
 
 1. `RenderRequestViewModel.Build()` reads the form, collects every problem it finds, and otherwise
-   lays the size and seed over the built-in preset.
+   lays the size and seed over the built-in preset. With custom colours on, it also replaces the
+   nebula's palettes with one ramp built from the rim and core colours and turns the hue nudge off, so
+   the colour is exactly what was picked. Colours are kept as hex text so the form has no dependency on
+   a UI toolkit's colour type; `RampStops` exposes the resulting ramp for a live swatch.
 2. `StarfieldRenderService` runs `StarfieldRenderer` on a worker thread while the preview area shows an
    indeterminate loader. The band loop reports progress only once per batch of bands, which is too
    coarse to animate, so the window does not use it.

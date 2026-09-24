@@ -65,6 +65,62 @@ public sealed class RenderRequestViewModelTests
     }
 
     [Fact]
+    public void Build_WithCustomColours_PinsOneRimToCorePaletteAndNoHueNudge()
+    {
+        var form = new RenderRequestViewModel
+        {
+            UseCustomColours = true,
+            RimColour = "#102040",
+            CoreColour = "#FFF0E0",
+        };
+
+        var built = form.Build();
+
+        Assert.True(built.IsValid);
+        var nebula = built.Options!.Nebula;
+        Assert.Equal(0.0f, nebula.HueVariation);
+        var palette = Assert.Single(nebula.Palettes);
+        Assert.Equal("#102040", palette.ColorStops[0].Color);
+        Assert.Equal("#FFF0E0", palette.ColorStops[^1].Color);
+        Assert.Empty(nebula.Validate());
+    }
+
+    [Fact]
+    public void Build_WithCustomColoursOff_IgnoresTheColoursEvenWhenInvalid()
+    {
+        var form = new RenderRequestViewModel { RimColour = "not a colour" };
+
+        var built = form.Build();
+
+        Assert.True(built.IsValid);
+        Assert.Equal(StarfieldPresets.Default().Nebula.Palettes.Count, built.Options!.Nebula.Palettes.Count);
+        Assert.Empty(form.RampStops);
+    }
+
+    [Fact]
+    public void Build_WithCustomColoursOn_ReportsInvalidHex()
+    {
+        var form = new RenderRequestViewModel { UseCustomColours = true, CoreColour = "orange" };
+
+        var built = form.Build();
+
+        Assert.False(built.IsValid);
+        Assert.Contains("Core colour must be a hex colour such as #7A2A18, but was 'orange'.", built.Problems);
+    }
+
+    [Fact]
+    public void RampStops_FollowTheColoursForPreviewing()
+    {
+        var form = new RenderRequestViewModel();
+        Assert.Equal(5, form.RampStops.Length);
+        Assert.Equal(RenderRequestViewModel.DefaultRimColour, form.RampStops[0]);
+
+        form.CoreColour = "#00FF00";
+
+        Assert.Equal("#00FF00", form.RampStops[^1]);
+    }
+
+    [Fact]
     public void RandomiseSeed_ProducesAParsableSeedThatChanges()
     {
         var form = new RenderRequestViewModel();

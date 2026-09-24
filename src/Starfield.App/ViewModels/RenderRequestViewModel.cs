@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Globalization;
+using Imaging.Core.Colors;
 using Starfield.App.Mvvm;
 using Starfield.Core.Options;
 
@@ -42,18 +43,27 @@ public sealed record RequestBuildResult(StarfieldOptions? Options, string Output
 }
 
 /// <summary>
-/// The form: where the image goes, how big it is and which seed draws it.
+/// The form: where the image goes, how big it is, which seed draws it, and optionally what colour the
+/// nebula is.
 /// </summary>
 /// <remarks>
-/// Fields are text so a half-typed value never throws. Blank means the built-in preset's value.
+/// Fields are text so a half-typed value never throws. Blank means the built-in preset's value. The
+/// nebula colours are hex text too, so the form stays free of any UI toolkit's colour type.
 /// </remarks>
 public sealed class RenderRequestViewModel : ObservableObject
 {
+    /// <summary>The rim colour the custom ramp starts with: a burnt sunset red.</summary>
+    public const string DefaultRimColour = "#7A2A18";
+
+    /// <summary>The core colour the custom ramp starts with: a warm glow.</summary>
+    public const string DefaultCoreColour = "#FFE8C0";
+
     /// <summary>Creates a form filled with the defaults.</summary>
     public RenderRequestViewModel()
     {
         Defaults = RequestDefaults.FromBuiltIn();
         OutputPath = Defaults.OutputPath;
+        RampStops = BuildRamp();
     }
 
     /// <summary>Gets the built-in defaults, for showing inside blank fields.</summary>
@@ -70,6 +80,39 @@ public sealed class RenderRequestViewModel : ObservableObject
 
     /// <summary>Gets or sets the seed text; blank means the default.</summary>
     public string Seed { get; set => SetProperty(ref field, value); } = "";
+
+    /// <summary>Gets or sets whether the nebula uses <see cref="RimColour"/> and <see cref="CoreColour"/> instead of a seed-chosen palette.</summary>
+    public bool UseCustomColours { get; set => SetProperty(ref field, value); }
+
+    /// <summary>Gets or sets the colour of the nebula's faint outer edge, as hex text.</summary>
+    public string RimColour
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                RampStops = BuildRamp();
+            }
+        }
+    } = DefaultRimColour;
+
+    /// <summary>Gets or sets the colour of the nebula's dense centre, as hex text.</summary>
+    public string CoreColour
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                RampStops = BuildRamp();
+            }
+        }
+    } = DefaultCoreColour;
+
+    /// <summary>Gets the custom ramp's stops as hex text, rim first, for previewing it.</summary>
+    /// <value>Empty while either colour is not valid hex; otherwise at least two stops.</value>
+    public ImmutableArray<string> RampStops { get; private set => SetProperty(ref field, value); }
 
     /// <summary>Picks a fresh seed at random.</summary>
     public void RandomiseSeed() => Seed = Random.Shared.NextInt64().ToString(CultureInfo.InvariantCulture);
@@ -90,10 +133,42 @@ public sealed class RenderRequestViewModel : ObservableObject
         var width = ParseDimension(Width, "Width", RequestDefaults.DefaultWidth, problems);
         var height = ParseDimension(Height, "Height", RequestDefaults.DefaultHeight, problems);
         var seed = ParseSeed(Seed, preset.Seed, problems);
+        var nebula = UseCustomColours ? CustomNebula(preset.Nebula, problems) : preset.Nebula;
 
         return problems.Count == 0
-            ? new RequestBuildResult(preset with { Width = width, Height = height, Seed = seed }, outputPath, [])
+            ? new RequestBuildResult(preset with { Width = width, Height = height, Seed = seed, Nebula = nebula }, outputPath, [])
             : new RequestBuildResult(null, outputPath, problems.ToImmutable());
+    }
+
+    private NebulaOptions CustomNebula(NebulaOptions preset, ImmutableArray<string>.Builder problems)
+    {
+        var rim = ParseColour(RimColour, "Rim colour", problems);
+        var core = ParseColour(CoreColour, "Core colour", problems);
+        return rim is null || core is null
+            ? preset
+            : (preset with
+            {
+                Palettes = [NebulaPalettes.Between("custom", rim.Value, core.Value)],
+                HueVariation = 0.0f,
+            });
+    }
+
+    private ImmutableArray<string> BuildRamp()
+    {
+        return !HexColor.TryParse(RimColour, out var rim) || !HexColor.TryParse(CoreColour, out var core)
+            ? []
+            : [.. NebulaPalettes.Between("preview", rim, core).ColorStops.Select(stop => stop.Color)];
+    }
+
+    private static LinearRgb? ParseColour(string text, string field, ImmutableArray<string>.Builder problems)
+    {
+        if (HexColor.TryParse(text, out var colour))
+        {
+            return colour;
+        }
+
+        problems.Add($"{field} must be a hex colour such as #7A2A18, but was '{text.Trim()}'.");
+        return null;
     }
 
     private static int ParseDimension(string text, string field, int fallback, ImmutableArray<string>.Builder problems)

@@ -1,4 +1,6 @@
-﻿namespace Starfield.Core.Options;
+﻿using Imaging.Core.Colors;
+
+namespace Starfield.Core.Options;
 
 /// <summary>
 /// The shipped nebula palettes: a spread of colour families that each read as a believable cloud.
@@ -27,6 +29,37 @@ public static class NebulaPalettes
     /// <summary>Gets the shipped palettes.</summary>
     /// <returns>The same immutable list on every call, with at least one entry.</returns>
     public static IReadOnlyList<NebulaPaletteOptions> Default() => Shipped;
+
+    /// <summary>Builds a palette that runs from one colour at the rim to another at the core.</summary>
+    /// <param name="name">The palette's name.</param>
+    /// <param name="rim">The colour of the faint outer edge.</param>
+    /// <param name="core">The colour of the dense centre.</param>
+    /// <param name="stopCount">How many evenly spaced stops to write. At least two.</param>
+    /// <returns>
+    /// A valid palette whose first stop is <paramref name="rim"/> and last is <paramref name="core"/>,
+    /// with the stops between blended in <see cref="Oklch"/>, so the hue travels the short way round the
+    /// wheel and the blend never dips through grey. Colours outside the display gamut clamp.
+    /// </returns>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty or whitespace.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="stopCount"/> is less than two.</exception>
+    public static NebulaPaletteOptions Between(string name, LinearRgb rim, LinearRgb core, int stopCount = 5)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentOutOfRangeException.ThrowIfLessThan(stopCount, 2);
+
+        var start = Oklch.FromOklab(Oklab.FromLinear(rim));
+        var end = Oklch.FromOklab(Oklab.FromLinear(core));
+        var stops = new List<ColorStopOptions>(stopCount);
+
+        for (var index = 0; index < stopCount; index++)
+        {
+            var position = (float)index / (stopCount - 1);
+            var colour = Oklch.Lerp(start, end, position).ToOklab().ToLinear();
+            stops.Add(new ColorStopOptions { Position = position, Color = HexColor.ToHex(colour) });
+        }
+
+        return new NebulaPaletteOptions { Name = name, ColorStops = stops };
+    }
 
     private static NebulaPaletteOptions Ramp(string name, string rim, string outer, string inner, string bright, string core) => new()
     {
