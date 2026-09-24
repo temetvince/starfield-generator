@@ -1,0 +1,108 @@
+# Builds a release when a version tag such as v1.2.0 is pushed.
+#
+# Every platform is published on its own runner so the macOS binaries carry the ad-hoc signature that
+# Apple Silicon requires. Self-contained single-file executables bundle the runtime, so nothing needs
+# installing; trimming is off because the preset format and the window's bindings rely on reflection.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build StarfieldGenerator.slnx --configuration Release
+      - run: dotnet test StarfieldGenerator.slnx --configuration Release --no-build
+
+  publish:
+    name: Publish ${{ matrix.rid }}
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-arm64
+          - os: macos-latest
+            rid: osx-x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish the command line and the desktop app
+        shell: bash
+        run: |
+          for project in src/Starfield.Cli src/Starfield.Ui; do
+            dotnet publish "$project" \
+              --configuration Release \
+              --runtime ${{ matrix.rid }} \
+              --self-contained true \
+              -p:PublishSingleFile=true \
+              -p:IncludeNativeLibrariesForSelfExtract=true \
+              -p:DebugType=none \
+              --output "publish/${{ matrix.rid }}"
+          done
+          # Documentation files come from the analyzer gate and the native symbols from SkiaSharp; neither ships.
+          rm -f publish/${{ matrix.rid }}/*.xml publish/${{ matrix.rid }}/*.pdb
+          ls -la "publish/${{ matrix.rid }}"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "dist/starfield-${{ github.ref_name }}-${{ matrix.rid }}.zip"
+
+      - name: Package (Linux and macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist
+          tar -czf "dist/starfield-${{ github.ref_name }}-${{ matrix.rid }}.tar.gz" -C "publish/${{ matrix.rid }}" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starfield-${{ matrix.rid }}
+          path: dist/*
+          retention-days: 1
+          if-no-files-found: error
+
+  release:
+    name: Create the GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List assets
+        run: ls -la dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Starfield Generator ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/*

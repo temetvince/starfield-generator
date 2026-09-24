@@ -121,6 +121,23 @@ The seam between the first two is `ILayerRenderer`: a layer must be able to rend
 of itself and produce exactly the pixels it would have produced rendering the whole image at once. That
 one rule is what makes banding, parallelism and reproducibility possible at the same time.
 
+## Releases
+
+Pushing a tag that starts with `v` builds a release. The workflow in `.github/workflows/release.yml`
+builds and tests the solution, then publishes self-contained single-file executables of both the
+command line and the desktop app for Windows (x64), Linux (x64) and macOS (Apple Silicon and Intel),
+and attaches one archive per platform to a GitHub release named after the tag:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Each archive holds `starfield` and `starfield-ui` with the .NET runtime bundled, so nothing needs
+installing. That makes them large, about 70 MB and 100 MB, which is the price of not asking users to
+install .NET. Trimming is left off on purpose: the preset format and the window's bindings use
+reflection.
+
 ## Tests
 
 ```sh
@@ -137,5 +154,6 @@ height and thread count cannot change a single pixel of the output.
 | `src/` | The five projects above. |
 | `tests/` | Four test projects plus the shared test-support library. |
 | `Directory.Build.props` | Repo-wide build settings, including the warnings-as-errors gate. |
+| `.github/workflows/` | The release workflow, triggered by version tags. |
 | `.editorconfig` | Analyzer rules, code style and naming. The source of truth for both. |
 | `AGENTS.md` | The working agreement for changes made here. |

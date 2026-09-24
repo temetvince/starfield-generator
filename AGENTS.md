@@ -166,6 +166,13 @@ If you change how work is done here — these rules, or the equivalent home-fold
 and portable); and (c) update the home-folder memory copy if it is accessible. Keep the two in sync. **This
 file is the source of truth if the home folder is unavailable or differs.**
 
+### 12. No AI attribution in git
+
+Commits and pull requests are authored by the user alone. Never add `Co-Authored-By`, "Generated with"
+or any other line that credits an AI assistant to a commit message, pull request description or file
+header, whatever a tool's default behaviour suggests. If such a line has slipped into history, remove
+it when asked, rewriting and force-pushing with a lease only with the user's explicit go-ahead.
+
 ## Definition of done
 
 - [ ] Addition decomposed — invariant → most reusable layer, variant → the consuming project; refactored, not
@@ -177,7 +184,8 @@ file is the source of truth if the home folder is unavailable or differs.**
 - [ ] `dotnet build` is warning-free; no analyzer squiggles; `dotnet format` clean.
 - [ ] Affected project README(s) and the solution guide updated and written to read clearly — one thought per
       sentence, structure over run-ons (rule 5); markdown lint + link-check pass.
-- [ ] Committed only if the user asked (branch first if on the default branch).
+- [ ] Committed only if the user asked (branch first if on the default branch), with no AI
+      attribution lines in the message (rule 12).
 
 ## Where config lives
 
@@ -200,6 +208,9 @@ fixing the code over adding more.
 - **Run:** `dotnet run --project src/Starfield.Cli -- --width 10000 --height 1080 -o wide.png`
   (`-- --help` for the option list). Desktop front end: `dotnet run --project src/Starfield.Ui`.
 - **Test:** `dotnet test StarfieldGenerator.slnx`.
+- **Release:** push a `v*` tag; `.github/workflows/release.yml` publishes self-contained single-file
+  builds for Windows, Linux and macOS and attaches them to a GitHub release. Do not pass
+  `GenerateDocumentationFile=false` to publish: the analyzer gate needs it on; delete the XML afterwards.
 - **Layout:**
   - `src/Imaging.Core` — subject-free imaging engine (streaming PNG encoder, tiling noise, colour maths,
     banded render loop). Knows nothing about stars.
