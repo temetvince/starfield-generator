@@ -4,8 +4,6 @@ A .NET 10 command-line tool that renders star fields and nebulae as PNG files, a
 store. It was built for wide parallax backdrops — 10000×1080 is the size it was tuned against — and it
 holds a fixed amount of memory no matter how large the image gets.
 
-![A wide star field with a purple nebula](docs/example.png)
-
 ## Quick start
 
 ```sh
